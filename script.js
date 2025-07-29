@@ -20,10 +20,10 @@ const estudiantes = {
 // Set para llevar control local de quién ya pasó asistencia
 const registrados = new Set();
 
-// ✅ URL corregida del Apps Script
+// ✅ URL del Apps Script que envía a Google Sheets
 const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbwPWuP7CiMJn6JQW9PmklpjWIuCY7LHg64s6Ojy9abxdFH0Pz91lueO3Fw_pL8tB9HaeA/exec";
 
-// Función para guardar en Google Sheets
+// ✅ Función para guardar en Google Sheets con encabezados en MAYÚSCULA
 function guardarEnSheets(codigo, nombre, apellido, curso, estado) {
   fetch(URL_GOOGLE_SHEETS, {
     method: "POST",
@@ -39,7 +39,7 @@ function guardarEnSheets(codigo, nombre, apellido, curso, estado) {
   });
 }
 
-// Verifica si el código es válido y registra asistencia
+// ✅ Verifica si el código es válido y registra asistencia
 function verificarCodigo() {
   const input = document.getElementById("codigoInput").value.trim();
   const resultado = document.getElementById("resultado");
@@ -63,7 +63,7 @@ function verificarCodigo() {
   document.getElementById("codigoInput").value = "";
 }
 
-// Muestra lista de todos con estado de asistencia
+// ✅ Muestra lista de estudiantes con estado de asistencia
 function mostrarLista() {
   const listaDiv = document.getElementById("listaAsistencia");
 
@@ -81,8 +81,14 @@ function mostrarLista() {
   }
 }
 
-// Limpia la hoja en Google Sheets
+// ✅ Limpia SOLO las asistencias (NO borra los encabezados ni los estudiantes)
 function formatearBase() {
-  fetch(URL_GOOGLE_SHEETS, { method: "GET" });
-  alert("📄 La base ha sido limpiada.");
+  fetch(URL_GOOGLE_SHEETS + "?accion=limpiar", { method: "GET" })
+    .then(() => {
+      alert("📄 Solo las asistencias fueron borradas.");
+      registrados.clear(); // También limpia el registro local
+    })
+    .catch(() => {
+      alert("❌ Error al intentar limpiar la base.");
+    });
 }
