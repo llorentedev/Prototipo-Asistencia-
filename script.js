@@ -17,19 +17,20 @@ const estudiantes = {
   "2025015": { nombre: "Diego", apellido: "Ríos", curso: "3ro Bachillerato A" }
 };
 
-// Set para llevar control local de quién ya pasó asistencia
+// Set para control local de asistencias
 const registrados = new Set();
 
-// ✅ URL del Apps Script (tu versión actual)
-const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbxfgvESATwlv3uOGoE3MWAjzcdjhjRQQicNWBe_TYd4E8oZQLME7xeHGwkT2_0sgaRRnw/exec";
+// ✅ URL del Apps Script (tu última versión)
+const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbwxISaVHhxOFxDgl018eKDYG8bgqdoLFNtzq9QptLjJ8r82M1YRGZ6Nhrjnjz7eT29x6g/exec";
 
-// ✅ Guardar asistencia individual
+// ✅ Guardar asistencia individual (insertar arriba y eliminar faltante si existía)
 function guardarEnSheets(codigo, nombre, apellido, curso, estado) {
   fetch(URL_GOOGLE_SHEETS, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
+      accion: "asistencia",
       CODIGO: codigo,
       NOMBRE: nombre,
       APELLIDO: apellido,
@@ -63,7 +64,7 @@ function verificarCodigo() {
   document.getElementById("codigoInput").value = "";
 }
 
-// ✅ Mostrar lista completa en pantalla
+// ✅ Mostrar lista de estudiantes en pantalla
 function mostrarLista() {
   const listaDiv = document.getElementById("listaAsistencia");
 
@@ -93,7 +94,7 @@ function formatearBase() {
     });
 }
 
-// ✅ Enviar lista de faltantes al cargar la página (saltando 5 filas)
+// ✅ Enviar faltantes al cargar (empezando 9 filas después de la última)
 function enviarFaltantes() {
   const faltantes = [];
 
@@ -122,7 +123,7 @@ function enviarFaltantes() {
   }
 }
 
-// ✅ Ejecutar al cargar página
+// ✅ Ejecutar al cargar la página
 window.onload = function () {
   enviarFaltantes();
 };
