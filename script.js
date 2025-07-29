@@ -1,3 +1,4 @@
+// Lista simulada de estudiantes
 const estudiantes = {
   "2025001": { nombre: "Juan Diego", apellido: "Llorente", curso: "3ro Bachillerato A" },
   "2025002": { nombre: "Ana", apellido: "Fernández", curso: "3ro Bachillerato A" },
@@ -16,41 +17,44 @@ const estudiantes = {
   "2025015": { nombre: "Diego", apellido: "Ríos", curso: "3ro Bachillerato A" }
 };
 
+// Set para llevar control local de quién ya pasó asistencia
 const registrados = new Set();
 
-// URL de tu Google Apps Script (reemplaza esta línea con tu URL real)
-const URL_GOOGLE_SHEETS = "Thttps://script.google.com/macros/s/AKfycby-76HaPxV_8ISA341liHgMm-cySs1UEs76DV_4Wj45hciLWXGJ-6u2cvbJS1d15VrKtQ/exec";
+// ✅ URL corregida del Apps Script
+const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbwPWuP7CiMJn6JQW9PmklpjWIuCY7LHg64s6Ojy9abxdFH0Pz91lueO3Fw_pL8tB9HaeA/exec";
 
-// Función para enviar los datos a Google Sheets
+// Función para guardar en Google Sheets
 function guardarEnSheets(codigo, nombre, apellido, curso, estado) {
   fetch(URL_GOOGLE_SHEETS, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      CODIGO,
-      NOMBRE,
-      APELLIDO,
-      CURSO,
-      ESTADO
+      CODIGO: codigo,
+      NOMBRE: nombre,
+      APELLIDO: apellido,
+      CURSO: curso,
+      ESTADO: estado
     })
   });
 }
 
-// Función principal para verificar el código ingresado
+// Verifica si el código es válido y registra asistencia
 function verificarCodigo() {
   const input = document.getElementById("codigoInput").value.trim();
   const resultado = document.getElementById("resultado");
 
   if (estudiantes[input]) {
     const est = estudiantes[input];
-    registrados.add(input); // Registrar asistencia
-
-    resultado.innerHTML = `✅ ${est.nombre} ${est.apellido} - ${est.curso} - Asistencia registrada`;
-    resultado.style.color = "green";
-
-    // Enviar datos a Google Sheets
-    guardarEnSheets(input, est.nombre, est.apellido, est.curso, "Asistió");
+    if (registrados.has(input)) {
+      resultado.innerHTML = `ℹ️ ${est.nombre} ${est.apellido} ya había registrado asistencia.`;
+      resultado.style.color = "orange";
+    } else {
+      registrados.add(input);
+      resultado.innerHTML = `✅ ${est.nombre} ${est.apellido} - ${est.curso} - Asistencia registrada`;
+      resultado.style.color = "green";
+      guardarEnSheets(input, est.nombre, est.apellido, est.curso, "ASISTIÓ");
+    }
   } else {
     resultado.innerHTML = `❌ No se detectó asistencia`;
     resultado.style.color = "red";
@@ -59,9 +63,10 @@ function verificarCodigo() {
   document.getElementById("codigoInput").value = "";
 }
 
-// Función para mostrar la lista de todos los estudiantes y su estado
+// Muestra lista de todos con estado de asistencia
 function mostrarLista() {
   const listaDiv = document.getElementById("listaAsistencia");
+
   if (listaDiv.style.display === "none") {
     let html = "<strong>Lista de estudiantes:</strong><br><br>";
     for (const codigo in estudiantes) {
@@ -76,7 +81,7 @@ function mostrarLista() {
   }
 }
 
-// Función para formatear (limpiar) la base de datos en Sheets
+// Limpia la hoja en Google Sheets
 function formatearBase() {
   fetch(URL_GOOGLE_SHEETS, { method: "GET" });
   alert("📄 La base ha sido limpiada.");
