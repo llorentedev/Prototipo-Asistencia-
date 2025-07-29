@@ -20,8 +20,8 @@ const estudiantes = {
 // Set para llevar control local de quién ya pasó asistencia
 const registrados = new Set();
 
-// ✅ URL del Apps Script
-const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbxnQBk_RTb0pTiG5CPOAGWBP5bbd2iUygPts0YmCXWohjc_moBYAhJn-bXXn3B8fLmSsA/exec";
+// ✅ URL del Apps Script (tu versión actual)
+const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbxfgvESATwlv3uOGoE3MWAjzcdjhjRQQicNWBe_TYd4E8oZQLME7xeHGwkT2_0sgaRRnw/exec";
 
 // ✅ Guardar asistencia individual
 function guardarEnSheets(codigo, nombre, apellido, curso, estado) {
@@ -93,7 +93,7 @@ function formatearBase() {
     });
 }
 
-// ✅ Enviar lista de faltantes (al cargar la página)
+// ✅ Enviar lista de faltantes al cargar la página (saltando 5 filas)
 function enviarFaltantes() {
   const faltantes = [];
 
@@ -110,11 +110,14 @@ function enviarFaltantes() {
   }
 
   if (faltantes.length > 0) {
-    fetch(URL_GOOGLE_SHEETS + "?accion=faltantes", {
+    fetch(URL_GOOGLE_SHEETS, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ faltantes })
+      body: JSON.stringify({
+        accion: "faltantes",
+        faltantes: faltantes
+      })
     });
   }
 }
