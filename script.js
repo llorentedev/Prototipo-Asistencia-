@@ -1,4 +1,3 @@
-// Lista simulada de estudiantes
 const estudiantes = {
   "2025001": { nombre: "Juan Diego", apellido: "Llorente", curso: "3ro Bachillerato A" },
   "2025002": { nombre: "Ana", apellido: "Fernández", curso: "3ro Bachillerato A" },
@@ -17,30 +16,29 @@ const estudiantes = {
   "2025015": { nombre: "Diego", apellido: "Ríos", curso: "3ro Bachillerato A" }
 };
 
-// Set para control local de asistencias
 const registrados = new Set();
 
-// ✅ URL del Apps Script (tu última versión)
+// ✅ Tu URL actual de Apps Script
 const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbwxISaVHhxOFxDgl018eKDYG8bgqdoLFNtzq9QptLjJ8r82M1YRGZ6Nhrjnjz7eT29x6g/exec";
 
-// ✅ Guardar asistencia individual (insertar arriba y eliminar faltante si existía)
+// ✅ Registrar asistencia y borrar si estaba en lista de faltantes
 function guardarEnSheets(codigo, nombre, apellido, curso, estado) {
   fetch(URL_GOOGLE_SHEETS, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      accion: "asistencia",
       CODIGO: codigo,
       NOMBRE: nombre,
       APELLIDO: apellido,
       CURSO: curso,
-      ESTADO: estado
+      ESTADO: estado,
+      accion: "asistencia"
     })
   });
 }
 
-// ✅ Verificar código ingresado
+// ✅ Verificar código
 function verificarCodigo() {
   const input = document.getElementById("codigoInput").value.trim();
   const resultado = document.getElementById("resultado");
@@ -64,7 +62,7 @@ function verificarCodigo() {
   document.getElementById("codigoInput").value = "";
 }
 
-// ✅ Mostrar lista de estudiantes en pantalla
+// ✅ Mostrar lista en pantalla
 function mostrarLista() {
   const listaDiv = document.getElementById("listaAsistencia");
 
@@ -94,7 +92,7 @@ function formatearBase() {
     });
 }
 
-// ✅ Enviar faltantes al cargar (empezando 9 filas después de la última)
+// ✅ Enviar faltantes (sección 9 filas más abajo)
 function enviarFaltantes() {
   const faltantes = [];
 
@@ -123,7 +121,7 @@ function enviarFaltantes() {
   }
 }
 
-// ✅ Ejecutar al cargar la página
+// ✅ Ejecutar al cargar página
 window.onload = function () {
   enviarFaltantes();
 };
