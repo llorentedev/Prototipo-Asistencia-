@@ -20,10 +20,10 @@ const estudiantes = {
 // Set para llevar control local de quién ya pasó asistencia
 const registrados = new Set();
 
-// ✅ URL del Apps Script que envía a Google Sheets
-const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbwPWuP7CiMJn6JQW9PmklpjWIuCY7LHg64s6Ojy9abxdFH0Pz91lueO3Fw_pL8tB9HaeA/exec";
+// ✅ URL del Apps Script
+const URL_GOOGLE_SHEETS = "https://script.google.com/macros/s/AKfycbxnQBk_RTb0pTiG5CPOAGWBP5bbd2iUygPts0YmCXWohjc_moBYAhJn-bXXn3B8fLmSsA/exec";
 
-// ✅ Función para guardar en Google Sheets con encabezados en MAYÚSCULA
+// ✅ Guardar asistencia individual
 function guardarEnSheets(codigo, nombre, apellido, curso, estado) {
   fetch(URL_GOOGLE_SHEETS, {
     method: "POST",
@@ -39,7 +39,7 @@ function guardarEnSheets(codigo, nombre, apellido, curso, estado) {
   });
 }
 
-// ✅ Verifica si el código es válido y registra asistencia
+// ✅ Verificar código ingresado
 function verificarCodigo() {
   const input = document.getElementById("codigoInput").value.trim();
   const resultado = document.getElementById("resultado");
@@ -63,7 +63,7 @@ function verificarCodigo() {
   document.getElementById("codigoInput").value = "";
 }
 
-// ✅ Muestra lista de estudiantes con estado de asistencia
+// ✅ Mostrar lista completa en pantalla
 function mostrarLista() {
   const listaDiv = document.getElementById("listaAsistencia");
 
@@ -81,14 +81,45 @@ function mostrarLista() {
   }
 }
 
-// ✅ Limpia SOLO las asistencias (NO borra los encabezados ni los estudiantes)
+// ✅ Limpiar asistencias en Sheets y local
 function formatearBase() {
   fetch(URL_GOOGLE_SHEETS + "?accion=limpiar", { method: "GET" })
     .then(() => {
       alert("📄 Solo las asistencias fueron borradas.");
-      registrados.clear(); // También limpia el registro local
+      registrados.clear();
     })
     .catch(() => {
       alert("❌ Error al intentar limpiar la base.");
     });
 }
+
+// ✅ Enviar lista de faltantes (al cargar la página)
+function enviarFaltantes() {
+  const faltantes = [];
+
+  for (const codigo in estudiantes) {
+    if (!registrados.has(codigo)) {
+      const est = estudiantes[codigo];
+      faltantes.push({
+        CODIGO: codigo,
+        NOMBRE: est.nombre,
+        APELLIDO: est.apellido,
+        CURSO: est.curso
+      });
+    }
+  }
+
+  if (faltantes.length > 0) {
+    fetch(URL_GOOGLE_SHEETS + "?accion=faltantes", {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ faltantes })
+    });
+  }
+}
+
+// ✅ Ejecutar al cargar página
+window.onload = function () {
+  enviarFaltantes();
+};
